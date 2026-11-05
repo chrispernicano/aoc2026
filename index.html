@@ -1,0 +1,93 @@
+<meta charset="utf-8">
+<title>Orrery Playground</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="src/style.css">
+
+<div class="page">
+  <header class="masthead">
+    <h1>Orrery</h1>
+    <p class="lede">A language with no loops and no <code>if</code> statements. Code runs when planets come around in their orbits.</p>
+  </header>
+
+  <nav class="examples" id="examples" aria-label="Example programs"></nav>
+
+  <main class="workbench">
+    <section class="pane editor-pane" aria-label="Program">
+      <div class="pane-head">
+        <span class="label">Program</span>
+        <span class="note" id="example-note"></span>
+      </div>
+      <div class="editor-wrap">
+        <pre class="gutter" id="gutter" aria-hidden="true"></pre>
+        <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Orrery source code"></textarea>
+      </div>
+      <label class="input-label" for="input"><span class="label">Input</span> <span class="note">one comet per line, read with <code>comet</code></span></label>
+      <textarea id="input" class="input-box" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="Paste puzzle input here"></textarea>
+      <div class="controls">
+        <button id="run" class="primary" type="button">Run</button>
+        <button id="step" type="button">Step one tick</button>
+        <button id="skip" type="button">Skip to end</button>
+        <button id="reset" type="button">Reset</button>
+        <label class="speed" for="speed">Speed
+          <input id="speed" type="range" min="1" max="60" value="8">
+        </label>
+      </div>
+      <p class="error" id="error" role="alert" hidden></p>
+    </section>
+
+    <section class="pane sky-pane" aria-label="The sky">
+      <div class="pane-head">
+        <span class="label">Sky</span>
+        <span class="tick-readout">tick <b id="tick">–</b></span>
+      </div>
+      <canvas id="sky" aria-label="Animated orbits of the program's planets"></canvas>
+      <ul class="legend" id="legend"></ul>
+    </section>
+
+    <section class="pane output-pane" aria-label="Output">
+      <div class="pane-head">
+        <span class="label">Output</span>
+        <span class="note" id="status"></span>
+      </div>
+      <ol class="output" id="output"></ol>
+    </section>
+  </main>
+
+  <details class="reference">
+    <summary>Language reference</summary>
+    <div class="ref-grid">
+      <div><h3>Top level</h3>
+        <pre>sky from 1 to 100      -- or: to forever
+planet p orbits 3 mass 0 { … }
+moon m orbits 4        -- silent planet
+eclipse p, q { … }     -- replaces both bodies
+when quiet { … }       -- nothing rose</pre></div>
+      <div><h3>Inside a body</h3>
+        <pre>say "text {expr}"
+launch moon orbits n
+tug p to n             -- set p's orbit
+drift by n             -- change own orbit
+collapse               -- end the program
+x if cond else y       -- last value = new mass
+say "hi" if cond       -- guard any line</pre></div>
+      <div><h3>Comets (input)</h3>
+        <pre>comets                 -- number of input lines
+comet                  -- this tick's line
+digits of "L68"        -- 68
+comet begins "L"       -- true or false</pre></div>
+      <div><h3>Rules</h3>
+        <p>A planet rises on every tick its orbit divides. Bodies read every planet's mass from the previous tick. Dividing by zero makes a black hole that swallows the planet.</p></div>
+    </div>
+  </details>
+</div>
+
+<script src="src/lexer.js"></script>
+<script src="src/parser.js"></script>
+<script src="src/eval.js"></script>
+<script src="src/runtime.js"></script>
+<script src="src/examples.js"></script>
+<script src="src/sky.js"></script>
+<script src="src/ui.js"></script>
