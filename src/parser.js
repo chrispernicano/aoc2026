@@ -44,11 +44,12 @@
         return l;
       };
     }
+    const aft = binLevel(primary, ['after'], true);
     function unary() {
       if (kw('not')) { next(); return { k: 'not', e: unary() }; }
       if (op('-')) { next(); return { k: 'neg', e: unary() }; }
       if (kw('digits')) { next(); expect('kw', 'of'); return { k: 'digits', e: unary() }; }
-      return primary();
+      return aft();
     }
     const mul = binLevel(unary, ['*', '/', '%']);
     const add = binLevel(mul, ['+', '-']);

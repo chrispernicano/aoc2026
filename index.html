@@ -12,7 +12,16 @@
     <p class="lede">A language with no loops and no <code>if</code> statements. Code runs when planets come around in their orbits.</p>
   </header>
 
-  <nav class="examples" id="examples" aria-label="Example programs"></nav>
+  <div class="catalog">
+    <div class="catalog-row">
+      <span class="label">Examples</span>
+      <nav class="examples" id="examples" aria-label="Example programs"></nav>
+    </div>
+    <div class="catalog-row">
+      <span class="label">Advent of Code 2025</span>
+      <nav class="examples aoc-days" id="aoc-days" aria-label="Advent of Code 2025 days"></nav>
+    </div>
+  </div>
 
   <main class="workbench">
     <section class="pane editor-pane" aria-label="Program">
@@ -24,7 +33,13 @@
         <pre class="gutter" id="gutter" aria-hidden="true"></pre>
         <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Orrery source code"></textarea>
       </div>
-      <label class="input-label" for="input"><span class="label">Input</span> <span class="note">one comet per line, read with <code>comet</code></span></label>
+      <div class="input-label">
+        <label for="input"><span class="label">Input</span> <span class="note">one comet per tick, read with <code>comet</code></span></label>
+        <div class="input-presets" id="input-presets" hidden>
+          <button type="button" id="use-example" class="chip">Example</button>
+          <button type="button" id="use-input" class="chip">Puzzle input</button>
+        </div>
+      </div>
       <textarea id="input" class="input-box" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="Paste puzzle input here"></textarea>
       <div class="controls">
         <button id="run" class="primary" type="button">Run</button>
@@ -53,6 +68,17 @@
         <span class="note" id="status"></span>
       </div>
       <ol class="output" id="output"></ol>
+      <form class="aoc-submit" id="aoc-submit-form" hidden>
+        <div class="aoc-submit-row">
+          <div class="aoc-part-toggle" role="group" aria-label="Puzzle part">
+            <button type="button" class="chip" id="aoc-part-1" aria-pressed="true">Part 1</button>
+            <button type="button" class="chip" id="aoc-part-2" aria-pressed="false">Part 2</button>
+          </div>
+          <input type="text" id="aoc-answer" class="aoc-answer-input" placeholder="Answer to submit" autocomplete="off" spellcheck="false" aria-label="Puzzle answer">
+          <button type="submit" id="aoc-submit-btn" class="primary">Submit</button>
+        </div>
+        <p class="aoc-submit-msg" id="aoc-submit-msg" role="status" hidden></p>
+      </form>
     </section>
   </main>
 
@@ -77,7 +103,8 @@ say "hi" if cond       -- guard any line</pre></div>
         <pre>comets                 -- number of input lines
 comet                  -- this tick's line
 digits of "L68"        -- 68
-comet begins "L"       -- true or false</pre></div>
+comet begins "L"       -- true or false
+"11-22" after "-"      -- "22"</pre></div>
       <div><h3>Rules</h3>
         <p>A planet rises on every tick its orbit divides. Bodies read every planet's mass from the previous tick. Dividing by zero makes a black hole that swallows the planet.</p></div>
     </div>

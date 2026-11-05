@@ -1,0 +1,150 @@
+-- AoC 2025 day 2: Gift Shop
+-- Find invalid product IDs made of a digit sequence repeated at least twice.
+--
+-- Pipeline overview (4 ticks from input comet to running totals):
+--   Tick t    : `a` and `b` parse the range endpoints from "lo-hi".
+--   Tick t + 1: `lo`/`hi` and `olo`/`ohi` clamp the range to even/odd digit
+--               lengths, and `step*` pick the repunit multiplier for that length.
+--   Tick t + 2: `first*`/`last*`/`span*` find the first and last multiples of
+--               each multiplier inside the clamped range.
+--   Tick t + 3: `part1`, `rep35`, `rep610`, and `repodd` add the arithmetic
+--               series sum (first + last) * count / 2 for their multiples.
+--   Tick N + 4: `shop` prints the final totals after the last range finishes.
+
+sky from 1 to comets + 4
+
+-- Stage 1: parse "a-b" from this tick's comet.
+planet a orbits 1 { digits of comet }
+planet b orbits 1 { digits of comet after "-" }
+
+-- Stage 2a (even digit lengths: 2, 4, 6, 8, or 10 digits):
+-- Each input range spans at most one even digit length. If `a` has an odd
+-- number of digits, round `lo` up to the start of the next even-digit band;
+-- if `b` has an odd number of digits, round `hi` down to the end of the
+-- previous even-digit band. Initial masses (lo=10, hi=0) keep lo > hi before
+-- the first range arrives so early pipeline ticks add nothing.
+planet lo orbits 1 mass 10 {
+  10 if a < 10
+    else 1000 if a >= 100 and a < 1000
+    else 100000 if a >= 10000 and a < 100000
+    else 10000000 if a >= 1000000 and a < 10000000
+    else 1000000000 if a >= 100000000 and a < 1000000000
+    else a
+}
+
+planet hi orbits 1 mass 0 {
+  0 if b < 10
+    else 99 if b >= 100 and b < 1000
+    else 9999 if b >= 10000 and b < 100000
+    else 999999 if b >= 1000000 and b < 10000000
+    else 99999999 if b >= 100000000 and b < 1000000000
+    else b
+}
+
+-- A k-digit block repeated twice inside a 2k-digit band is a multiple of 10^k + 1:
+-- 2 digits -> 11, 4 -> 101, 6 -> 1001, 8 -> 10001, 10 -> 100001.
+planet step orbits 1 mass 11 {
+  11 if a < 100
+    else 101 if a < 10000
+    else 1001 if a < 1000000
+    else 10001 if a < 100000000
+    else 100001
+}
+
+-- Part 2 also allows odd repeat counts inside even-length numbers:
+--   - 6-digit numbers repeated 3 times (ab|ab|ab) are multiples of 10101.
+--   - 10-digit numbers repeated 5 times (ab|ab|ab|ab|ab) are multiples of 101010101.
+-- For other even lengths (2, 4, 8), use 10^11 so no multiple falls in [lo, hi].
+planet step2 orbits 1 mass 100000000000 {
+  10101 if a >= 10000 and a < 1000000
+    else 101010101 if a >= 100000000
+    else 100000000000
+}
+
+-- Numbers repeated 6 times (a|a|a|a|a|a, multiple of 111111) or 10 times
+-- (multiple of 1111111111) are counted by both `step` (2-repeat) and `step2`
+-- (3- or 5-repeat), so we track them here and subtract once by inclusion-exclusion.
+planet step6 orbits 1 mass 100000000000 {
+  111111 if a >= 10000 and a < 1000000
+    else 1111111111 if a >= 100000000
+    else 100000000000
+}
+
+-- Stage 2b (odd digit lengths: 3, 5, 7, or 9 digits):
+-- Clamp [a, b] to the single odd-digit band it can overlap.
+planet olo orbits 1 mass 100 {
+  100 if a < 100
+    else 10000 if a >= 1000 and a < 10000
+    else 1000000 if a >= 100000 and a < 1000000
+    else 100000000 if a >= 10000000 and a < 100000000
+    else 10000000000 if a >= 1000000000
+    else a
+}
+
+planet ohi orbits 1 mass 0 {
+  0 if b < 100
+    else 999 if b >= 1000 and b < 10000
+    else 99999 if b >= 100000 and b < 1000000
+    else 9999999 if b >= 10000000 and b < 100000000
+    else 999999999 if b >= 1000000000
+    else b
+}
+
+-- Multipliers for odd digit lengths in Part 2:
+--   3 digits (1x3) -> 111
+--   5 digits (1x5) -> 11111
+--   7 digits (1x7) -> 1111111
+--   9 digits (3x3) -> 1001001 (also covers 1x9 = 111111111)
+planet ostep orbits 1 mass 111 {
+  111 if a < 1000
+    else 11111 if a < 100000
+    else 1111111 if a < 10000000
+    else 1001001
+}
+
+-- Stage 3: round `lo` up (`lo + -lo % step`) and `hi` down (`hi - hi % step`)
+-- to the first and last multiples of each multiplier inside the clamped band.
+-- `span*` carries the multiplier forward one tick so Stage 4 has it in sync.
+planet first orbits 1 mass 11 { lo + -lo % step }
+planet last orbits 1 mass 0   { hi - hi % step }
+planet span orbits 1 mass 11  { step }
+
+planet first2 orbits 1 mass 11 { lo + -lo % step2 }
+planet last2 orbits 1 mass 0   { hi - hi % step2 }
+planet span2 orbits 1 mass 11  { step2 }
+
+planet first6 orbits 1 mass 11 { lo + -lo % step6 }
+planet last6 orbits 1 mass 0   { hi - hi % step6 }
+planet span6 orbits 1 mass 11  { step6 }
+
+planet ofirst orbits 1 mass 111 { olo + -olo % ostep }
+planet olast orbits 1 mass 0    { ohi - ohi % ostep }
+planet ospan orbits 1 mass 111  { ostep }
+
+-- Stage 4: when first <= last, sum all multiples first, first + span, ..., last
+-- using the arithmetic series formula: (first + last) * ((last - first) / span + 1) / 2.
+planet part1 orbits 1 mass 0 {
+  part1 + (first + last) * ((last - first) / span + 1) / 2 if first <= last
+    else part1
+}
+
+planet rep35 orbits 1 mass 0 {
+  rep35 + (first2 + last2) * ((last2 - first2) / span2 + 1) / 2 if first2 <= last2
+    else rep35
+}
+
+planet rep610 orbits 1 mass 0 {
+  rep610 + (first6 + last6) * ((last6 - first6) / span6 + 1) / 2 if first6 <= last6
+    else rep610
+}
+
+planet repodd orbits 1 mass 0 {
+  repodd + (ofirst + olast) * ((olast - ofirst) / ospan + 1) / 2 if ofirst <= olast
+    else repodd
+}
+
+-- After 4 pipeline stages, all `comets` ranges have been accumulated.
+planet shop orbits comets + 4 {
+  say "part 1: {part1}"
+  say "part 2: {part1 + rep35 - rep610 + repodd}"
+}

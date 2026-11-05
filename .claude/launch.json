@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "orrery",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8765"],
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["bin/serve.js", "8765"],
       "port": 8765
     }
   ]

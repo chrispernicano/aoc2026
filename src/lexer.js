@@ -6,7 +6,7 @@
     'sky', 'from', 'to', 'forever', 'planet', 'moon', 'orbits', 'mass',
     'eclipse', 'when', 'quiet', 'say', 'launch', 'tug', 'drift', 'by',
     'collapse', 'if', 'else', 'and', 'or', 'not', 'true', 'false', 'tick',
-    'comet', 'comets', 'digits', 'of', 'begins',
+    'comet', 'comets', 'digits', 'of', 'begins', 'after',
   ]);
   const OPS = ['==', '!=', '<=', '>=', '+', '-', '*', '/', '%', '<', '>', '(', ')', '{', '}', ','];
 

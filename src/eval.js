@@ -43,6 +43,11 @@
         if (e.o === 'and') return evaluate(e.l, env) && evaluate(e.r, env);
         if (e.o === 'or') return evaluate(e.l, env) || evaluate(e.r, env);
         if (e.o === 'begins') return O.format(evaluate(e.l, env)).startsWith(O.format(evaluate(e.r, env)));
+        if (e.o === 'after') {
+          const s = O.format(evaluate(e.l, env)), sub = O.format(evaluate(e.r, env));
+          const i = s.indexOf(sub);
+          return i < 0 ? '' : s.slice(i + sub.length);
+        }
         const l = evaluate(e.l, env), r = evaluate(e.r, env);
         switch (e.o) {
           case '==': return l === r;

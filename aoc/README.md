@@ -63,11 +63,13 @@ This installs a launchd agent (`~/Library/LaunchAgents/dev.orrery.aoc-fetch.plis
 day but does nothing outside the event. If the Mac is asleep at 00:05, launchd runs it on wake.
 Output goes to `aoc/.fetch.log`.
 
-## Running a solution
+## Running & submitting a solution
 
 ```bash
 node bin/orrery.js aoc/2025/day01/solution.orr               # uses input.txt beside it
 node bin/orrery.js aoc/2025/day01/solution.orr example.txt   # any other input
+node bin/aoc.js submit 2025 1 1 1043                         # submit part 1 or 2 from CLI
+node bin/serve.js                                            # playground at http://localhost:8765 with Submit button
 ```
 
-You can also paste a solution and input into the playground (`index.html`).
+In the web playground (`node bin/serve.js`), selecting an Advent of Code day shows a **Part 1 / Part 2** answer submission bar in the Output pane that auto-fills from your program's output and automatically refreshes `puzzle.md` when Part 1 is solved.

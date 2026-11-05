@@ -1,6 +1,6 @@
 // Checks puzzle HTML -> Markdown on a made-up page shaped like an Advent of Code puzzle.
 const assert = require('assert');
-const { puzzleMarkdown, unlockTime, isUnlocked, daysIn } = require('../lib/aoc-client.js');
+const { puzzleMarkdown, answerFeedback, unlockTime, isUnlocked, daysIn } = require('../lib/aoc-client.js');
 
 const html = `<main>
 <article class="day-desc"><h2>--- Day 3: Test Orbit ---</h2><p>See <a href="/2026/about">the rules</a> &amp; read <em>carefully</em>.</p>
@@ -53,4 +53,16 @@ assert.strictEqual(isUnlocked(2026, 1, new Date('2026-12-01T04:59:59Z')), false)
 assert.strictEqual(isUnlocked(2026, 1, new Date('2026-12-01T05:00:00Z')), true);
 assert.strictEqual(daysIn(2024), 25);
 assert.strictEqual(daysIn(2025), 12);
+
+const rightHtml = `<main><article><p>That's the right answer! You are <span class="day-success">one gold star</span> closer. <a href="/2025/day/2#part2">[Continue to Part Two]</a></p></article></main>`;
+const wrongHtml = `<main><article><p>That's not the right answer; your answer is too low. <a href="/2025/day/2">[Return to Day 2]</a></p></article></main>`;
+assert.deepStrictEqual(answerFeedback(rightHtml), {
+  ok: true,
+  message: "That's the right answer! You are one gold star closer.",
+});
+assert.deepStrictEqual(answerFeedback(wrongHtml), {
+  ok: false,
+  message: "That's not the right answer; your answer is too low.",
+});
+
 console.log('aoc-markdown: ok');

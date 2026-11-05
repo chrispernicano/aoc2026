@@ -110,6 +110,18 @@ function scheduleCmd([action]) {
 const [cmd, ...rest] = process.argv.slice(2);
 (async () => {
   if (cmd === 'fetch') await fetchCmd(rest);
+  else if (cmd === 'submit') {
+    const [year, day, part, ...ansParts] = rest;
+    const answer = ansParts.join(' ');
+    if (!year || !day || !part || !answer) {
+      console.error('usage: node bin/aoc.js submit <year> <day> <1|2> <answer>');
+      process.exit(2);
+    }
+    const res = await aoc.submit(Number(year), Number(day), Number(part), answer);
+    log(res.message);
+    if (res.updatedPuzzle) log(`aoc/${year}/day${String(day).padStart(2, '0')}/puzzle.md updated`);
+    process.exit(res.ok ? 0 : 1);
+  }
   else if (cmd === 'schedule') scheduleCmd(rest);
-  else { console.error('usage: node bin/aoc.js fetch [year [day]] | schedule install|remove|status'); process.exit(2); }
+  else { console.error('usage: node bin/aoc.js fetch [year [day]] | submit <year> <day> <1|2> <answer> | schedule install|remove|status'); process.exit(2); }
 })().catch((e) => { log(`error: ${e.message}`); process.exit(1); });

@@ -5,9 +5,9 @@
 
   O.createRun = function createRun(src, input) {
     const prog = O.parse(src);
-    // Input lines are comets: one passes by on each tick, starting with the first tick of the sky.
+    // Input lines (or comma-separated items) are comets: one passes by on each tick.
     const comets = (input || '').replace(/\r/g, '').replace(/\n+$/, '');
-    const lines = comets === '' ? [] : comets.split('\n');
+    const lines = comets === '' ? [] : (!comets.includes('\n') || /,\n/.test(comets)) ? comets.split(/,\s*/) : comets.split('\n');
     const constEnv = { tick: 0, comets: lines.length, read: (n, line) => { throw new Err(`"${n}" can't be used here`, line); } };
     const toInt = (v, what, line) => {
       if (typeof v !== 'number' || !Number.isFinite(v)) throw new Err(`${what} must be a number`, line);

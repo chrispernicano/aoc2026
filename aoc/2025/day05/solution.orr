@@ -1,0 +1,8 @@
+-- Advent of Code 2025, day 5
+-- Puzzle: puzzle.md. Input: input.txt, one comet per line.
+-- Run: node bin/orrery.js aoc/2025/day05/solution.orr
+
+sky from 1 to comets
+
+planet lines orbits 1 mass 0 { lines + 1 }
+planet done orbits comets { say "read {lines + 1} lines" }

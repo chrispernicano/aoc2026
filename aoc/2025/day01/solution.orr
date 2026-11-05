@@ -1,20 +1,38 @@
--- AoC 2025 day 1: how many rotations
--- leave the dial on 0?
--- One input line ("L68") passes per tick.
+-- AoC 2025 day 1: Secret Entrance
+-- Safe dial has numbers 0..99 and starts at 50.
+-- One input rotation ("L68" or "R48") passes as `comet` per tick.
 
 sky from 1 to comets + 1
 
+-- New dial position (0..99) after applying this tick's rotation.
 planet dial orbits 1 mass 50 {
   (dial - digits of comet) % 100 if comet begins "L"
     else (dial + digits of comet) % 100
 }
 
--- reads last tick's dial: one turn behind
+-- Total clicks past 0 in the direction of motion on this tick:
+--   - Going right from `dial`, we start `dial` clicks past 0.
+--   - Going left from `dial`, we start `-dial % 100` (i.e. (100 - dial) % 100) clicks past 0.
+-- Adding `digits of comet` gives the unwrapped distance reached; every full 100
+-- in `reach` means the dial clicked onto 0 once during this rotation.
+planet reach orbits 1 mass 0 {
+  (-dial % 100 if comet begins "L" else dial) + digits of comet
+}
+
+-- Part 1: count how many rotations leave `dial` pointing at 0.
+-- Because planets read last tick's masses, `zeros` runs one tick behind `dial`.
 planet zeros orbits 1 mass 0 {
   zeros + 1 if dial == 0 else zeros
 }
 
--- one extra tick lets the last turn land
+-- Part 2: count every click that lands on 0 during or at the end of a rotation.
+-- Integer floor division `floor(reach / 100)` is `(reach - reach % 100) / 100`.
+planet clicks orbits 1 mass 0 {
+  clicks + (reach - reach % 100) / 100
+}
+
+-- Run on tick `comets + 1` and include the final rotation's contribution.
 planet door orbits comets + 1 {
-  say "password: {zeros + 1 if dial == 0 else zeros}"
+  say "part 1: {zeros + 1 if dial == 0 else zeros}"
+  say "part 2: {clicks + (reach - reach % 100) / 100}"
 }
