@@ -1,0 +1,6 @@
+# Advent of Code asks that puzzle text and inputs not be published.
+aoc/**/puzzle.md
+aoc/**/input.txt
+aoc/**/example.txt
+aoc/.fetch.log
+.DS_Store

@@ -1,6 +1,5 @@
 // Runs every example in Node and prints its output.
-for (const f of ['lexer', 'parser', 'eval', 'runtime', 'examples']) require(`../src/${f}.js`);
-const O = globalThis.Orrery;
+const O = require('../src/node.js');
 let failed = 0;
 for (const ex of O.examples) {
   try {

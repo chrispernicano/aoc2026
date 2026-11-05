@@ -1,0 +1,20 @@
+-- AoC 2025 day 1: how many rotations
+-- leave the dial on 0?
+-- One input line ("L68") passes per tick.
+
+sky from 1 to comets + 1
+
+planet dial orbits 1 mass 50 {
+  (dial - digits of comet) % 100 if comet begins "L"
+    else (dial + digits of comet) % 100
+}
+
+-- reads last tick's dial: one turn behind
+planet zeros orbits 1 mass 0 {
+  zeros + 1 if dial == 0 else zeros
+}
+
+-- one extra tick lets the last turn land
+planet door orbits comets + 1 {
+  say "password: {zeros + 1 if dial == 0 else zeros}"
+}
