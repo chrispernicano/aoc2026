@@ -183,6 +183,16 @@
     history.replaceState(null, '', '#' + item.id);
     $('example-note').textContent = `AoC ${item.year} · Day ${item.day}: ${item.title}`;
 
+    // Populate immediately from the bundled catalog so Example / Puzzle input
+    // buttons appear right away (including on GitHub Pages and file://).
+    code.value = item.src || '';
+    aocInputs = {
+      example: item.example || '',
+      input: item.input || '',
+    };
+    input.value = aocInputs.example || aocInputs.input;
+    syncInputPresetButtons();
+
     const [liveSrc, liveExample, liveInput, livePuzzle] = await Promise.all([
       fetchOptionalText(`${item.dir}/solution.orr`),
       fetchOptionalText(`${item.dir}/example.txt`),
@@ -194,10 +204,10 @@
     const solvedParts = (livePuzzle && livePuzzle.match(/Your puzzle answer was/g) || []).length;
     setAocPart(solvedParts >= 1 ? 2 : 1);
 
-    code.value = liveSrc ?? item.src ?? `-- ${item.dir}/solution.orr not found`;
+    code.value = liveSrc || item.src || `-- ${item.dir}/solution.orr not found`;
     aocInputs = {
-      example: liveExample ?? item.example ?? '',
-      input: liveInput ?? item.input ?? '',
+      example: liveExample || item.example || '',
+      input: liveInput || item.input || '',
     };
     // Prefer `example.txt` by default so the orbital visualization is quick to watch,
     // falling back to `input.txt` when no example file is present.
