@@ -13,6 +13,7 @@
   // and its fetched `{ example, input }` texts.
   let currentAoc = null;
   let aocInputs = { example: '', input: '' };
+  let preferredInputMode = 'example';
   let aocPart = 1;
   // Stores the latest detected answers from program output (`part 1: ...`, `part 2: ...`).
   let detectedAnswers = { 1: '', 2: '' };
@@ -127,25 +128,32 @@
     }
   }
 
-  // Show/hide the Example vs Puzzle Input toggle buttons for AoC days.
+  // Update the Example input vs Actual input toggle buttons.
   function syncInputPresetButtons() {
-    const hasEx = Boolean(aocInputs.example);
-    const hasIn = Boolean(aocInputs.input);
-    presetsBox.hidden = !hasEx && !hasIn;
-    exPresetBtn.hidden = !hasEx;
-    inPresetBtn.hidden = !hasIn;
-    exPresetBtn.setAttribute('aria-pressed', String(hasEx && input.value === aocInputs.example));
-    inPresetBtn.setAttribute('aria-pressed', String(hasIn && input.value === aocInputs.input));
+    const fallback = (O.aoc && O.aoc[0]) || { example: '', input: '' };
+    const exText = aocInputs.example || fallback.example || '';
+    const inText = aocInputs.input || fallback.input || '';
+    exPresetBtn.disabled = !exText;
+    inPresetBtn.disabled = !inText;
+    exPresetBtn.setAttribute('aria-pressed', String(Boolean(currentAoc && exText && input.value === exText)));
+    inPresetBtn.setAttribute('aria-pressed', String(Boolean(currentAoc && inText && input.value === inText)));
   }
 
-  function applyInputPreset(text, autoplay) {
+  function applyInputPreset(mode, autoplay) {
+    preferredInputMode = mode;
+    // If the user clicks Example/Actual input while on a non-AoC example, switch to Day 1 first.
+    if (!currentAoc && O.aoc && O.aoc.length) {
+      loadAocDay(O.aoc[0], autoplay);
+      return;
+    }
+    const text = mode === 'input' ? aocInputs.input : aocInputs.example;
     input.value = text;
     syncInputPresetButtons();
     stop(); run = null; lastEv = null; setError(null); clearOutput(); draw();
     if (autoplay) start();
   }
-  exPresetBtn.addEventListener('click', () => applyInputPreset(aocInputs.example, true));
-  inPresetBtn.addEventListener('click', () => applyInputPreset(aocInputs.input, true));
+  exPresetBtn.addEventListener('click', () => applyInputPreset('example', true));
+  inPresetBtn.addEventListener('click', () => applyInputPreset('input', true));
 
   function loadExample(ex, autoplay) {
     currentAoc = null;
@@ -183,14 +191,17 @@
     history.replaceState(null, '', '#' + item.id);
     $('example-note').textContent = `AoC ${item.year} · Day ${item.day}: ${item.title}`;
 
-    // Populate immediately from the bundled catalog so Example / Puzzle input
-    // buttons appear right away (including on GitHub Pages and file://).
+    // Populate immediately from the bundled catalog so Example / Actual input
+    // buttons work right away (including on GitHub Pages and file://).
     code.value = item.src || '';
     aocInputs = {
       example: item.example || '',
       input: item.input || '',
     };
-    input.value = aocInputs.example || aocInputs.input;
+    const pickInput = () => (preferredInputMode === 'input'
+      ? (aocInputs.input || aocInputs.example)
+      : (aocInputs.example || aocInputs.input));
+    input.value = pickInput();
     syncInputPresetButtons();
 
     const [liveSrc, liveExample, liveInput, livePuzzle] = await Promise.all([
@@ -209,9 +220,7 @@
       example: liveExample || item.example || '',
       input: liveInput || item.input || '',
     };
-    // Prefer `example.txt` by default so the orbital visualization is quick to watch,
-    // falling back to `input.txt` when no example file is present.
-    input.value = aocInputs.example || aocInputs.input;
+    input.value = pickInput();
     syncInputPresetButtons();
 
     stop(); run = null; lastEv = null; setError(null); clearOutput(); paintGutter(); draw();
